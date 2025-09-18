@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package product;
+option go_package = "product-service-api/internal/product/adapter/handler/grpc/pb;pb";
+
+import "google/protobuf/timestamp.proto";
+
+// request
+message CreateProductRequest {
+  string name = 1;
+  string user_id = 2;  
+  string description = 3;
+  string price = 4;         
+  int32 stock = 5;
+  string image_filename = 6;  
+  bytes image_bytes = 7;         
+}
+
+message UpdateProductRequest {
+  string id = 1;            
+  string name = 2;
+  string description = 3;
+  string price = 4;         
+  int32 stock = 5;
+  string image_filename = 6;  
+  bytes image_bytes = 7;  
+}
+
+message DeleteProductRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message GetProductByIDRequest {
+  string id = 1;
+}
+
+message EmptyRequest {}
+
+// response
+message ProductResponse {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  string description = 4;
+  string price = 5;
+  int32 stock = 6;
+  string image_url = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message DeleteProductResponse {
+  string message = 1;
+}
+
+message ListProductResponse {
+  repeated ProductResponse products = 1;
+}
+
+service ProductCommandService {
+  rpc CreateProduct(CreateProductRequest) returns (ProductResponse);
+  rpc UpdateProduct(UpdateProductRequest) returns (ProductResponse);
+  rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse);
+}
+
+service ProductQueryService {
+  rpc GetProductByID(GetProductByIDRequest) returns (ProductResponse);
+  rpc GetAllProducts(EmptyRequest) returns (ListProductResponse);
+}
+

@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package product;
+option go_package = "product-service-api/internal/product/adapter/client/pb;pb";
+
+
+// request
+message UserRegisterRequest {
+  string name = 1;
+  string email = 2;
+  string role = 3;
+  string password = 4;
+  string confirm_password = 5;
+}
+
+message UserLoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message GetUserByIDRequest {
+  string id = 1;
+}
+
+// response
+message UserRegisterResponse {
+  string id = 1;
+  string role = 2;
+  string email = 3;
+}
+
+message UserLoginResponse {
+  string id = 1;
+  string role = 2;
+  string token = 3;
+}
+
+message UserResponse {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string role = 4;
+}
+
+service UserCommandService {
+  rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
+  rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
+}
+
+service UserQueryService {
+  rpc GetUserByID(GetUserByIDRequest) returns (UserResponse);
+}

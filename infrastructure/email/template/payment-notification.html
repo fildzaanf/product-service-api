@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Notification</title>
+    <style>
+        .email-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #e4e7eb;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .email-header {
+            color: #7c3aed;
+            margin-bottom: 20px;
+        }
+        .email-content {
+            color: #4b5563;
+            margin-bottom: 20px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .info-table td {
+            padding: 8px;
+            vertical-align: top;
+        }
+        .info-table .label {
+            text-align: start;
+            padding-right: 15px;
+            font-weight: bold;
+            width: 30%;
+        }
+        .info-table .value {
+            text-align: start;
+            width: 70%;
+        }
+        .info-table .value::before {
+            content: ": ";
+        }
+
+        /* Status Colors */
+        .status-success {
+            font-weight: bold;
+            color: green;
+        }
+        .status-pending {
+            font-weight: bold;
+            color: orange;
+        }
+        .status-failed,
+        .status-deny,
+        .status-cancel,
+        .status-expire {
+            font-weight: bold;
+            color: red;
+        }
+
+        .email-footer {
+            border-top: 1px solid #e4e7eb;
+            margin-top: 20px;
+            padding-top: 20px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f3f4f6;">
+    <div class="email-container">
+        <h1 class="email-header">Go Commerce</h1>
+   
+        <p class="email-content">Dear {{.Name}},</p>
+        <p class="email-content">This is a notification regarding your recent payment transaction.</p>
+
+        <table class="info-table">
+            <tr>
+                <td class="label">Payment Code</td>
+                <td class="value">{{.PaymentCode}}</td>
+            </tr>
+            <tr>
+                <td class="label">Product Name</td>
+                <td class="value">{{.ProductName}}</td>
+            </tr>
+            <tr>
+                <td class="label">Price</td>
+                <td class="value">{{.Price}}</td>
+            </tr>
+            <tr>
+                <td class="label">Quantity</td>
+                <td class="value">{{.Quantity}}</td>
+            </tr>
+            <tr>
+                <td class="label">Total Amount</td>
+                <td class="value">{{.TotalAmount}}</td>
+            </tr>
+            <tr>
+                <td class="label">Status</td>
+                <td class="value 
+                    {{ if eq .Status "success" }}status-success
+                    {{ else if eq .Status "pending" }}status-pending
+                    {{ else if or (eq .Status "deny") (eq .Status "cancel") (eq .Status "expire") }}status-failed
+                    {{ else }}status-failed{{ end }}">
+                    {{.Status}}
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Date </td>
+                <td class="value">{{.UpdatedAt}}</td>
+            </tr>
+        </table>
+
+        <p class="email-content">If you have any questions or concerns, please contact our support team.</p>
+        <p class="email-content">Best regards,<br>Go Commerce Team</p>
+        
+        <div class="email-footer">&copy; 2025 Go Commerce Inc</div>
+    </div>
+</body>
+</html>
