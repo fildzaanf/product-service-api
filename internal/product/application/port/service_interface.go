@@ -1,16 +1,17 @@
 package port // inbound
 
 import (
+	"context"
 	entity "product-service-api/internal/product/domain"
 )
 
 type ProductCommandServiceInterface interface {
-	CreateProduct(product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error)
-	UpdateProductByID(id string, product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error)
-	DeleteProductByID(id string) error
+	CreateProduct(ctx context.Context, product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error)
+	UpdateProductByID(ctx context.Context,id string, product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error)
+	DeleteProductByID(ctx context.Context, id string) error
 }
 
 type ProductQueryServiceInterface interface {
-	GetProductByID(id string) (entity.Product, error)
-	GetAllProducts() ([]entity.Product, error)
+	GetProductByID(ctx context.Context, id string) (entity.Product, error)
+	GetAllProducts(ctx context.Context) ([]entity.Product, error)
 }

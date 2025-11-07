@@ -2,9 +2,10 @@ package grpc // inbound
 
 import (
 	"context"
-	"product-service-api/internal/product/application/port"
-	mapping "product-service-api/internal/product/adapter/handler/grpc/pb"
+	"fmt"
 	"product-service-api/internal/product/adapter/handler/grpc/pb"
+	mapping "product-service-api/internal/product/adapter/handler/grpc/pb"
+	"product-service-api/internal/product/application/port"
 	"product-service-api/pkg/constant"
 	"product-service-api/pkg/middleware"
 
@@ -27,7 +28,7 @@ func NewProductCommandHandler(pcs port.ProductCommandServiceInterface, pqs port.
 
 func (ph *productCommandHandler) CreateProduct(ctx context.Context, productRequest *pb.CreateProductRequest) (*pb.ProductResponse, error) {
 
-	userID, role, errExtract := middleware.ExtractTokenFromContext(ctx)
+	userID, role, _, errExtract := middleware.ExtractTokenFromContext(ctx)
 	if errExtract != nil {
 		return nil, status.Error(codes.Unauthenticated, "unauthorized access")
 	}
@@ -41,7 +42,7 @@ func (ph *productCommandHandler) CreateProduct(ctx context.Context, productReque
 
 	productEntity := mapping.CreateProductRequestToEntity(productRequest, userID)
 
-	createdProduct, err := ph.productCommandService.CreateProduct(productEntity, imageBytes, imageFilename)
+	createdProduct, err := ph.productCommandService.CreateProduct(ctx, productEntity, imageBytes, imageFilename)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -53,7 +54,7 @@ func (ph *productCommandHandler) CreateProduct(ctx context.Context, productReque
 
 func (ph *productCommandHandler) UpdateProduct(ctx context.Context, productRequest *pb.UpdateProductRequest) (*pb.ProductResponse, error) {
 
-	userID, role, errExtract := middleware.ExtractTokenFromContext(ctx)
+	userID, role, _, errExtract := middleware.ExtractTokenFromContext(ctx)
 	if errExtract != nil {
 		return nil, status.Error(codes.Unauthenticated, "unauthorized access")
 	}
@@ -62,7 +63,7 @@ func (ph *productCommandHandler) UpdateProduct(ctx context.Context, productReque
 		return nil, status.Error(codes.InvalidArgument, "product id is required")
 	}
 
-	product, errGetProduct := ph.productQueryService.GetProductByID(productRequest.GetId())
+	product, errGetProduct := ph.productQueryService.GetProductByID(ctx, productRequest.GetId())
 	if errGetProduct != nil {
 		return nil, status.Error(codes.NotFound, "product not found")
 	}
@@ -79,8 +80,9 @@ func (ph *productCommandHandler) UpdateProduct(ctx context.Context, productReque
 	productID := productRequest.GetId()
 
 	productEntity := mapping.UpdateProductRequestToEntity(productRequest)
+	productEntity.UserID = userID
 
-	updatedProduct, err := ph.productCommandService.UpdateProductByID(productID, productEntity, imageBytes, imageFilename)
+	updatedProduct, err := ph.productCommandService.UpdateProductByID(ctx, productID, productEntity, imageBytes, imageFilename)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
@@ -92,7 +94,7 @@ func (ph *productCommandHandler) UpdateProduct(ctx context.Context, productReque
 
 func (ph *productCommandHandler) DeleteProduct(ctx context.Context, req *pb.DeleteProductRequest) (*pb.DeleteProductResponse, error) {
 
-	userID, role, errExtract := middleware.ExtractTokenFromContext(ctx)
+	userID, role, _, errExtract := middleware.ExtractTokenFromContext(ctx)
 	if errExtract != nil {
 		return nil, status.Error(codes.Unauthenticated, "unauthorized access")
 	}
@@ -101,7 +103,7 @@ func (ph *productCommandHandler) DeleteProduct(ctx context.Context, req *pb.Dele
 		return nil, status.Error(codes.InvalidArgument, "product id is required")
 	}
 
-	product, err := ph.productQueryService.GetProductByID(req.GetId())
+	product, err := ph.productQueryService.GetProductByID(ctx, req.GetId())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "product not found")
 	}
@@ -113,9 +115,11 @@ func (ph *productCommandHandler) DeleteProduct(ctx context.Context, req *pb.Dele
 		return nil, status.Error(codes.PermissionDenied, constant.ERROR_ROLE_ACCESS)
 	}
 
-	if errDelete := ph.productCommandService.DeleteProductByID(req.GetId()); errDelete != nil {
+	if errDelete := ph.productCommandService.DeleteProductByID(ctx, req.GetId()); errDelete != nil {
 		return nil, status.Error(codes.InvalidArgument, errDelete.Error())
 	}
 
-	return &mapping.DeleteProductResponse{}, nil
+	return &pb.DeleteProductResponse{
+		Message: fmt.Sprintf("product with id %s deleted successfully", req.GetId()),
+	}, nil
 }

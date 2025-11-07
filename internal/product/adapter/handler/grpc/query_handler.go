@@ -28,7 +28,7 @@ func (ph *productQueryHandler) GetProductByID(ctx context.Context, productReques
 		return nil, fmt.Errorf("product id is required")
 	}
 
-	product, err := ph.productQueryService.GetProductByID(productRequest.GetId())
+	product, err := ph.productQueryService.GetProductByID(ctx, productRequest.GetId())
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "product not found")
 	}
@@ -39,7 +39,7 @@ func (ph *productQueryHandler) GetProductByID(ctx context.Context, productReques
 }
 
 func (ph *productQueryHandler) GetAllProducts(ctx context.Context, _ *pb.EmptyRequest) (*pb.ListProductResponse, error) {
-	products, err := ph.productQueryService.GetAllProducts()
+	products, err := ph.productQueryService.GetAllProducts(ctx)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "product not found")
 	}

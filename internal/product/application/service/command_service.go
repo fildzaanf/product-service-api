@@ -1,7 +1,7 @@
 package service
 
 import (
-	ctx "context"
+	"context"
 	"errors"
 	"fmt"
 	"product-service-api/infrastructure/cloud"
@@ -28,9 +28,9 @@ func NewProductCommandService(pcr port.ProductCommandRepositoryInterface, pqr po
 	}
 }
 
-func (pcs *productCommandService) CreateProduct(product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error) {
+func (pcs *productCommandService) CreateProduct(ctx context.Context, product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error) {
 
-	_, errGetUser := pcs.userQueryClient.GetUserByID(ctx.Background(), product.UserID)
+	_, errGetUser := pcs.userQueryClient.GetUserByID(ctx, product.UserID)
 	if errGetUser != nil {
 		return entity.Product{}, fmt.Errorf("invalid user: %w", errGetUser)
 	}
@@ -62,7 +62,7 @@ func (pcs *productCommandService) CreateProduct(product entity.Product, imageByt
 		product.ID = uuid.New().String()
 	}
 
-	createdProduct, err := pcs.productCommandRepository.CreateProduct(product)
+	createdProduct, err := pcs.productCommandRepository.CreateProduct(ctx, product)
 	if err != nil {
 		return entity.Product{}, err
 	}
@@ -70,21 +70,22 @@ func (pcs *productCommandService) CreateProduct(product entity.Product, imageByt
 	return createdProduct, nil
 }
 
-func (pcs *productCommandService) UpdateProductByID(id string, product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error) {
-	_, errGetUser := pcs.userQueryClient.GetUserByID(ctx.Background(), product.UserID)
+func (pcs *productCommandService) UpdateProductByID(ctx context.Context, id string, product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error) {
+	_, errGetUser := pcs.userQueryClient.GetUserByID(ctx, product.UserID)
 	if errGetUser != nil {
 		return entity.Product{}, fmt.Errorf("invalid user: %w", errGetUser)
 	}
-	
-	existingProduct, err := pcs.productQueryRepository.GetProductByID(id)
+
+	existingProduct, err := pcs.productQueryRepository.GetProductByID(ctx, id)
 	if err != nil {
 		return entity.Product{}, errors.New(constant.ERROR_PRODUCT_NOT_FOUND)
 	}
 
-	if product.Name != "" {
+	if product.Name != "" && product.Name != existingProduct.Name {
 		existingProduct.Name = product.Name
 	}
-	if product.Description != "" {
+
+	if product.Description != "" && product.Description != existingProduct.Description {
 		existingProduct.Description = product.Description
 	}
 	if product.Price.GreaterThan(decimal.NewFromInt(0)) {
@@ -104,7 +105,7 @@ func (pcs *productCommandService) UpdateProductByID(id string, product entity.Pr
 
 	existingProduct.ID = id
 
-	updatedProduct, err := pcs.productCommandRepository.UpdateProductByID(id, existingProduct)
+	updatedProduct, err := pcs.productCommandRepository.UpdateProductByID(ctx, id, existingProduct)
 	if err != nil {
 		return entity.Product{}, err
 	}
@@ -112,14 +113,14 @@ func (pcs *productCommandService) UpdateProductByID(id string, product entity.Pr
 	return updatedProduct, nil
 }
 
-func (pcs *productCommandService) DeleteProductByID(id string) error {
+func (pcs *productCommandService) DeleteProductByID(ctx context.Context, id string) error {
 
-	_, err := pcs.productQueryRepository.GetProductByID(id)
+	_, err := pcs.productQueryRepository.GetProductByID(ctx, id)
 	if err != nil {
 		return errors.New(constant.ERROR_PRODUCT_NOT_FOUND)
 	}
 
-	if err := pcs.productCommandRepository.DeleteProductByID(id); err != nil {
+	if err := pcs.productCommandRepository.DeleteProductByID(ctx, id); err != nil {
 		return err
 	}
 

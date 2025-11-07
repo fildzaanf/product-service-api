@@ -1,11 +1,11 @@
 package gorm
 
-
 import (
+	"context"
 	"errors"
-	entity "product-service-api/internal/product/domain"
 	"product-service-api/internal/product/adapter/model"
 	"product-service-api/internal/product/application/port"
+	entity "product-service-api/internal/product/domain"
 
 	"gorm.io/gorm"
 )
@@ -20,7 +20,7 @@ func NewProductQueryRepository(db *gorm.DB) port.ProductQueryRepositoryInterface
 	}
 }
 
-func (pr *productQueryRepository) GetProductByID(id string) (entity.Product, error) {
+func (pr *productQueryRepository) GetProductByID(ctx context.Context, id string) (entity.Product, error) {
 	var product model.Product
 	result := pr.db.Where("id = ?", id).First(&product)
 
@@ -34,7 +34,7 @@ func (pr *productQueryRepository) GetProductByID(id string) (entity.Product, err
 	return entity.ProductModelToEntity(product), nil
 }
 
-func (pr *productQueryRepository) GetAllProducts() ([]entity.Product, error) {
+func (pr *productQueryRepository) GetAllProducts(ctx context.Context) ([]entity.Product, error) {
 	var products []model.Product
 	result := pr.db.Find(&products)
 

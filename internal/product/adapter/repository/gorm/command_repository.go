@@ -1,11 +1,10 @@
 package gorm
 
-
 import (
+	"context"
 	"errors"
-	"fmt"
-	entity"product-service-api/internal/product/domain"
 	"product-service-api/internal/product/application/port"
+	entity "product-service-api/internal/product/domain"
 	"time"
 
 	"github.com/shopspring/decimal"
@@ -22,7 +21,7 @@ func NewProductCommandRepository(db *gorm.DB) port.ProductCommandRepositoryInter
 	}
 }
 
-func (pcr *productCommandRepository) CreateProduct(product entity.Product) (entity.Product, error) {
+func (pcr *productCommandRepository) CreateProduct(ctx context.Context, product entity.Product) (entity.Product, error) {
 	tx := pcr.db.Begin()
 	if tx.Error != nil {
 		return entity.Product{}, tx.Error
@@ -40,7 +39,7 @@ func (pcr *productCommandRepository) CreateProduct(product entity.Product) (enti
 	return product, nil
 }
 
-func (pcr *productCommandRepository) UpdateProductByID(id string, product entity.Product) (entity.Product, error) {
+func (pcr *productCommandRepository) UpdateProductByID(ctx context.Context, id string, product entity.Product) (entity.Product, error) {
 	tx := pcr.db.Begin()
 	if tx.Error != nil {
 		return entity.Product{}, tx.Error
@@ -70,7 +69,6 @@ func (pcr *productCommandRepository) UpdateProductByID(id string, product entity
 		updateFields["image_url"] = product.ImageURL
 	}
 
-
 	if len(updateFields) > 0 {
 		updateFields["updated_at"] = time.Now()
 
@@ -81,14 +79,13 @@ func (pcr *productCommandRepository) UpdateProductByID(id string, product entity
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		fmt.Println("Commit Error:", err)
 		return entity.Product{}, err
 	}
 
 	return existingProduct, nil
 }
 
-func (pcr *productCommandRepository) DeleteProductByID(id string) error {
+func (pcr *productCommandRepository) DeleteProductByID(ctx context.Context, id string) error {
 	tx := pcr.db.Begin()
 	if tx.Error != nil {
 		return tx.Error
@@ -106,7 +103,7 @@ func (pcr *productCommandRepository) DeleteProductByID(id string) error {
 	return nil
 }
 
-func (pcr *productCommandRepository) UpdateProductStockByID(productID string, newStock int) error {
+func (pcr *productCommandRepository) UpdateProductStockByID(ctx context.Context, productID string, newStock int) error {
 	tx := pcr.db.Begin()
 	if tx.Error != nil {
 		return tx.Error

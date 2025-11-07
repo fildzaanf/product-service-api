@@ -23,12 +23,14 @@ func NewProductQueryHandler(pcs port.ProductCommandServiceInterface, pqs port.Pr
 
 // query
 func (ph *productQueryHandler) GetProductByID(c echo.Context) error {
+	ctx := c.Request().Context()
+	
 	productID := c.Param("id")
 	if productID == "" {
 		return c.JSON(http.StatusBadRequest, response.ErrorResponse("product id is required"))
 	}
 
-	product, err := ph.productQueryService.GetProductByID(productID)
+	product, err := ph.productQueryService.GetProductByID(ctx, productID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, response.ErrorResponse("product not found"))
 	}
@@ -38,7 +40,9 @@ func (ph *productQueryHandler) GetProductByID(c echo.Context) error {
 }
 
 func (ph *productQueryHandler) GetAllProducts(c echo.Context) error {
-	products, err := ph.productQueryService.GetAllProducts()
+	ctx := c.Request().Context()
+
+	products, err := ph.productQueryService.GetAllProducts(ctx)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, response.ErrorResponse("failed to retrieve products"))
 	}

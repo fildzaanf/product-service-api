@@ -24,6 +24,7 @@ func NewProductCommandHandler(pcs port.ProductCommandServiceInterface, pqs port.
 }
 
 func (h *productCommandHandler) CreateProduct(c echo.Context) error {
+	 ctx := c.Request().Context()
 	userID, role, errExtract := middleware.ExtractToken(c)
 	if errExtract != nil {
 		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
@@ -58,7 +59,7 @@ func (h *productCommandHandler) CreateProduct(c echo.Context) error {
 
 	product := CreateProductRequestToEntity(productRequest, userID)
 
-	createdProduct, err := h.productCommandService.CreateProduct(product, imageBytes, imageFilename)
+	createdProduct, err := h.productCommandService.CreateProduct(ctx, product, imageBytes, imageFilename)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.ErrorResponse(err.Error()))
 	}
@@ -70,6 +71,8 @@ func (h *productCommandHandler) CreateProduct(c echo.Context) error {
 }
 
 func (ph *productCommandHandler) UpdateProductByID(c echo.Context) error {
+	ctx := c.Request().Context()
+
 	userID, role, errExtract := middleware.ExtractToken(c)
 	if errExtract != nil {
 		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
@@ -80,7 +83,7 @@ func (ph *productCommandHandler) UpdateProductByID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.ErrorResponse("product id is required"))
 	}
 
-	product, err := ph.productQueryService.GetProductByID(productID)
+	product, err := ph.productQueryService.GetProductByID(ctx, productID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, response.ErrorResponse("product not found"))
 	}
@@ -118,7 +121,7 @@ func (ph *productCommandHandler) UpdateProductByID(c echo.Context) error {
 
 	productEntity := UpdateProductRequestToEntity(productRequest)
 
-	updatedProduct, err := ph.productCommandService.UpdateProductByID(productID, productEntity, imageBytes, imageFilename)
+	updatedProduct, err := ph.productCommandService.UpdateProductByID(ctx, productID, productEntity, imageBytes, imageFilename)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.ErrorResponse(err.Error()))
 	}
@@ -128,6 +131,8 @@ func (ph *productCommandHandler) UpdateProductByID(c echo.Context) error {
 }
 
 func (ph *productCommandHandler) DeleteProductByID(c echo.Context) error {
+	ctx := c.Request().Context()
+
 	userID, role, errExtract := middleware.ExtractToken(c)
 	if errExtract != nil {
 		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
@@ -138,7 +143,7 @@ func (ph *productCommandHandler) DeleteProductByID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, response.ErrorResponse("product id is required"))
 	}
 
-	product, err := ph.productQueryService.GetProductByID(productID)
+	product, err := ph.productQueryService.GetProductByID(ctx, productID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, response.ErrorResponse("product not found"))
 	}
@@ -151,7 +156,7 @@ func (ph *productCommandHandler) DeleteProductByID(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response.ErrorResponse(constant.ERROR_ROLE_ACCESS))
 	}
 
-	if err := ph.productCommandService.DeleteProductByID(productID); err != nil {
+	if err := ph.productCommandService.DeleteProductByID(ctx, productID); err != nil {
 		return c.JSON(http.StatusBadRequest, response.ErrorResponse(err.Error()))
 	}
 
