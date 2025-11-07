@@ -9,7 +9,7 @@ type ProductCommandRepositoryInterface interface {
 	CreateProduct(ctx context.Context, product entity.Product) (entity.Product, error)
 	UpdateProductByID(ctx context.Context, id string, product entity.Product) (entity.Product, error)
 	DeleteProductByID(ctx context.Context, id string) error
-	UpdateProductStockByID(ctx context.Context, productID string, newStock int) error
+	UpdateProductStockByID(ctx context.Context, id string, newStock int) error
 }
 
 type ProductQueryRepositoryInterface interface {
