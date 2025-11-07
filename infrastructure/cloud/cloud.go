@@ -64,7 +64,6 @@ func UploadImageToS3(image *multipart.FileHeader) (string, error) {
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(imagePath),
 		Body:   file,
-		ACL:    "public-read",
 	})
 	if err != nil {
 		logrus.Error("failed to upload file to S3:", err)
