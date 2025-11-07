@@ -115,7 +115,6 @@ func UploadImageBytesToS3(imageBytes []byte, originalFilename string) (string, e
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(imagePath),
 		Body:   bytes.NewReader(imageBytes),
-		ACL:    "public-read",
 	})
 	if err != nil {
 		logrus.Error("failed to upload file to S3:", err)
