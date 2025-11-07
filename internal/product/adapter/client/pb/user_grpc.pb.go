@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.32.0
-// source: internal/product/adapter/client/pb/user.proto
+// source: user.proto
 
 package pb
 
@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserCommandService_RegisterUser_FullMethodName = "/product.UserCommandService/RegisterUser"
-	UserCommandService_LoginUser_FullMethodName    = "/product.UserCommandService/LoginUser"
+	UserCommandService_RegisterUser_FullMethodName = "/user.UserCommandService/RegisterUser"
+	UserCommandService_LoginUser_FullMethodName    = "/user.UserCommandService/LoginUser"
 )
 
 // UserCommandServiceClient is the client API for UserCommandService service.
@@ -142,7 +142,7 @@ func _UserCommandService_LoginUser_Handler(srv interface{}, ctx context.Context,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserCommandService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "product.UserCommandService",
+	ServiceName: "user.UserCommandService",
 	HandlerType: (*UserCommandServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -155,11 +155,11 @@ var UserCommandService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/product/adapter/client/pb/user.proto",
+	Metadata: "user.proto",
 }
 
 const (
-	UserQueryService_GetUserByID_FullMethodName = "/product.UserQueryService/GetUserByID"
+	UserQueryService_GetUserByID_FullMethodName = "/user.UserQueryService/GetUserByID"
 )
 
 // UserQueryServiceClient is the client API for UserQueryService service.
@@ -248,7 +248,7 @@ func _UserQueryService_GetUserByID_Handler(srv interface{}, ctx context.Context,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserQueryService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "product.UserQueryService",
+	ServiceName: "user.UserQueryService",
 	HandlerType: (*UserQueryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -257,5 +257,5 @@ var UserQueryService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/product/adapter/client/pb/user.proto",
+	Metadata: "user.proto",
 }
