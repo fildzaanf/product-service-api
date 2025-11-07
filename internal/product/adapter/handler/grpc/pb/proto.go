@@ -14,17 +14,36 @@ func CreateProductRequestToEntity(request *CreateProductRequest, userID string) 
 		Name:        request.Name,
 		Description: request.Description,
 		Price:       price,
+		Stock:       int(request.Stock),
 	}
 }
 
 func UpdateProductRequestToEntity(request *UpdateProductRequest) entity.Product {
-	price, _ := decimal.NewFromString(request.Price)
-	return entity.Product{
-		Name:        request.Name,
-		Description: request.Description,
-		Price:       price,
-		Stock:       int(request.Stock),
+
+	product := entity.Product{
+		UserID: request.UserId,
 	}
+
+	if request.Name != "" {
+		product.Name = request.Name
+	}
+	if request.Description != "" {
+		product.Description = request.Description
+	}
+
+	if request.Price != "" {
+		price, err := decimal.NewFromString(request.Price)
+		if err != nil {
+			return entity.Product{}
+		}
+		product.Price = price
+	}
+
+	if request.Stock >= 0 {
+		product.Stock = int(request.Stock)
+	}
+
+	return product
 }
 
 func ProductEntityToResponse(product entity.Product) *ProductResponse {
