@@ -51,12 +51,14 @@ func (c *userGRPCClient) GetUserByID(ctx context.Context, userID string) (*pb.Us
 	})
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
-	userRequest := &pb.GetUserByIDRequest{Id: userID}
+	userRequest := &pb.GetUserByIDRequest{
+		Id: userID,
+	}
 
-	userResp, err := c.client.GetUserByID(ctx, userRequest)
+	userResponse, err := c.client.GetUserByID(ctx, userRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	return userResp, nil
+	return userResponse, nil
 }

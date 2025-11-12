@@ -44,8 +44,8 @@ func (pcs *productCommandService) CreateProduct(ctx context.Context, product ent
 	}
 
 	if err := validator.IsDataEmpty(
-		[]string{"name", "description", "image_url", "price", "stock"},
-		product.Name, product.Description, product.ImageURL, product.Price, product.Stock,
+		[]string{"name", "description", "price", "stock"},
+		product.Name, product.Description, product.Price, product.Stock,
 	); err != nil {
 		return entity.Product{}, err
 	}
