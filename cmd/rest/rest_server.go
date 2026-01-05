@@ -1,4 +1,4 @@
-package rest
+package main
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"product-service-api/infrastructure/database"
 	router "product-service-api/internal/product/adapter/handler/rest"
 	"product-service-api/pkg/middleware"
+	userClient "product-service-api/internal/product/adapter/client"
 
 	"net/http"
 	"os"
@@ -20,13 +21,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupRoutes(e *echo.Echo, db *gorm.DB) {
+func SetupRoutes(e *echo.Echo, db *gorm.DB, userHost, userPort string) {
 	product := e.Group("/products")
-	router.ProductRouter(product, db)
+
+	userQueryClient := userClient.NewUserRESTClient(userHost, userPort)
+
+	router.ProductRouter(product, db, userQueryClient)
 }
 
 func main() {
-
 	middleware.InitLogger()
 
 	godotenv.Load()
@@ -45,11 +48,9 @@ func main() {
 	middleware.Recover(e)
 	middleware.CORS(e)
 
-	SetupRoutes(e, psql)
+	SetupRoutes(e, psql, config.USERSERVICE.USER_REST_HOST, config.USERSERVICE.USER_REST_PORT)
 
-	host := config.SERVER.SERVER_HOST
-	port := config.SERVER.SERVER_PORT
-	address := host + ":" + port
+	address := config.PRODUCTSERVICE.PRODUCT_REST_HOST + ":" + config.PRODUCTSERVICE.PRODUCT_REST_PORT
 
 	errChan := make(chan error, 1)
 	var wg sync.WaitGroup
