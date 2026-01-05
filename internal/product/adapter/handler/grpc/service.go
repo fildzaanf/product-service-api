@@ -1,10 +1,10 @@
 package grpc
 
 import (
-	"product-service-api/internal/product/application/service"
-	gormRepository "product-service-api/internal/product/adapter/repository/gorm"
-	"product-service-api/internal/product/adapter/handler/grpc/pb"
 	userClient "product-service-api/internal/product/adapter/client"
+	"product-service-api/internal/product/adapter/handler/grpc/pb"
+	gormRepository "product-service-api/internal/product/adapter/repository/gorm"
+	"product-service-api/internal/product/application/service"
 
 	grpc "google.golang.org/grpc"
 	"gorm.io/gorm"
@@ -13,7 +13,7 @@ import (
 func RegisterProductServices(server *grpc.Server, db *gorm.DB, conn *grpc.ClientConn) {
 	productQueryRepository := gormRepository.NewProductQueryRepository(db)
 	productCommandRepository := gormRepository.NewProductCommandRepository(db)
-	
+
 	userQueryClient := userClient.NewUserGRPCClient(conn)
 
 	productQueryService := service.NewProductQueryService(productQueryRepository, productCommandRepository)
