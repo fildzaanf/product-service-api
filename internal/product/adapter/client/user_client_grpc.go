@@ -2,11 +2,10 @@ package client
 
 import (
 	"context"
-	"time"
-
 	"product-service-api/internal/product/adapter/client/pb"
 	"product-service-api/internal/product/application/port"
 	"product-service-api/pkg/middleware"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -24,7 +23,7 @@ func NewUserGRPCClient(conn *grpc.ClientConn) port.UserQueryClientInterface {
 	}
 }
 
-func (c *userGRPCClient) GetUserByID(ctx context.Context, userID string) (*pb.UserResponse, error) {
+func (c *userGRPCClient) GetUserByID(ctx context.Context, userID string) error {
 	var token string
 
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
@@ -40,7 +39,7 @@ func (c *userGRPCClient) GetUserByID(ctx context.Context, userID string) (*pb.Us
 	}
 
 	if token == "" {
-		return nil, status.Error(codes.Unauthenticated, "missing raw token in context")
+		return status.Error(codes.Unauthenticated, "missing raw token in context")
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
@@ -55,10 +54,10 @@ func (c *userGRPCClient) GetUserByID(ctx context.Context, userID string) (*pb.Us
 		Id: userID,
 	}
 
-	userResponse, err := c.client.GetUserByID(ctx, userRequest)
+	_, err := c.client.GetUserByID(ctx, userRequest)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return userResponse, nil
+	return nil
 }
