@@ -30,7 +30,7 @@ func main() {
 
 	psql := database.ConnectPostgreSQL(false)
 
-	userServiceAddress := config.USERSERVICE.USER_HOST + ":" + config.USERSERVICE.USER_PORT
+	userServiceAddress := config.USERSERVICE.USER_GRPC_HOST + ":" + config.USERSERVICE.USER_GRPC_PORT
 	userConn, err := grpc.NewClient(userServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("[ERROR] failed to connect to user service: %v", err)
@@ -45,7 +45,7 @@ func main() {
 
 	reflection.Register(server)
 
-	address := config.PRODUCTSERVICE.PRODUCT_HOST + ":" + config.PRODUCTSERVICE.PRODUCT_PORT
+	address := config.PRODUCTSERVICE.PRODUCT_GRPC_HOST + ":" + config.PRODUCTSERVICE.PRODUCT_GRPC_PORT
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatalf("[FATAL] failed to listen product service: %v", err)
