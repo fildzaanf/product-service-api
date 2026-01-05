@@ -11,7 +11,6 @@ type Configuration struct {
 	MYSQL          MySQLConfig
 	POSTGRESQL     PostgreSQLConfig
 	JWT            JWTConfig
-	SERVER         ServerConfig
 	CLOUDSTORAGE   CloudStorageConfig
 	MIDTRANS       MidtransConfig
 	SMTP           SMTPConfig
@@ -34,11 +33,6 @@ type (
 		POSTGRESQL_HOST string
 		POSTGRESQL_PORT string
 		POSTGRESQL_NAME string
-	}
-
-	ServerConfig struct {
-		SERVER_HOST string
-		SERVER_PORT string
 	}
 
 	JWTConfig struct {
@@ -64,12 +58,16 @@ type (
 		SMTP_HOST string
 	}
 	ProductServiceConfig struct {
-		PRODUCT_HOST string
-		PRODUCT_PORT string
+		PRODUCT_REST_HOST string
+		PRODUCT_REST_PORT string
+		PRODUCT_GRPC_HOST string
+		PRODUCT_GRPC_PORT string
 	}
 	UserServiceConfig struct {
-		USER_HOST string
-		USER_PORT string
+		USER_REST_HOST string
+		USER_REST_PORT string
+		USER_GRPC_HOST string
+		USER_GRPC_PORT string
 	}
 )
 
@@ -100,10 +98,6 @@ func LoadConfig() (*Configuration, error) {
 			POSTGRESQL_PORT: os.Getenv("POSTGRESQL_PORT"),
 			POSTGRESQL_NAME: os.Getenv("POSTGRESQL_NAME"),
 		},
-		SERVER: ServerConfig{
-			SERVER_HOST: os.Getenv("SERVER_HOST"),
-			SERVER_PORT: os.Getenv("SERVER_PORT"),
-		},
 		JWT: JWTConfig{
 			JWT_SECRET: os.Getenv("JWT_SECRET"),
 		},
@@ -124,12 +118,16 @@ func LoadConfig() (*Configuration, error) {
 			SMTP_HOST: os.Getenv("SMTP_HOST"),
 		},
 		PRODUCTSERVICE: ProductServiceConfig{
-			PRODUCT_HOST: os.Getenv("PRODUCT_HOST"),
-			PRODUCT_PORT: os.Getenv("PRODUCT_PORT"),		
+			PRODUCT_REST_HOST: os.Getenv("PRODUCT_REST_HOST"),
+			PRODUCT_REST_PORT: os.Getenv("PRODUCT_REST_PORT"),
+			PRODUCT_GRPC_HOST: os.Getenv("PRODUCT_GRPC_HOST"),
+			PRODUCT_GRPC_PORT: os.Getenv("PRODUCT_GRPC_PORT"),
 		},
 		USERSERVICE: UserServiceConfig{	
-			USER_HOST: os.Getenv("USER_HOST"),
-			USER_PORT: os.Getenv("USER_PORT"),
+			USER_REST_HOST: os.Getenv("USER_REST_HOST"),
+			USER_REST_PORT: os.Getenv("USER_REST_PORT"),
+			USER_GRPC_HOST: os.Getenv("USER_GRPC_HOST"),
+			USER_GRPC_PORT: os.Getenv("USER_GRPC_PORT"),
 		},
 	}, nil
 }
