@@ -1,9 +1,9 @@
 package rest
 
-
 import (
-	"product-service-api/internal/product/application/service"
 	gormRepository "product-service-api/internal/product/adapter/repository/gorm"
+	"product-service-api/internal/product/application/port"
+	"product-service-api/internal/product/application/service"
 
 	"product-service-api/pkg/middleware"
 
@@ -11,12 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
-func ProductRouter(product *echo.Group, db *gorm.DB) {
+func ProductRouter(product *echo.Group, db *gorm.DB, userQueryClient port.UserQueryClientInterface) {
 	productQueryRepository := gormRepository.NewProductQueryRepository(db)
 	productCommandRepository := gormRepository.NewProductCommandRepository(db)
 
 	productQueryService := service.NewProductQueryService(productQueryRepository, productCommandRepository)
-	productCommandService := service.NewProductCommandService(productCommandRepository, productQueryRepository, nil)
+	productCommandService := service.NewProductCommandService(productCommandRepository, productQueryRepository, userQueryClient)
 
 	productQueryHandler := NewProductQueryHandler(productCommandService, productQueryService)
 	productCommandHandler := NewProductCommandHandler(productCommandService, productQueryService)
