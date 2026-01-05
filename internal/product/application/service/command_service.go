@@ -27,10 +27,8 @@ func NewProductCommandService(pcr port.ProductCommandRepositoryInterface, pqr po
 		userQueryClient:          uqr,
 	}
 }
-
 func (pcs *productCommandService) CreateProduct(ctx context.Context, product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error) {
-
-	_, errGetUser := pcs.userQueryClient.GetUserByID(ctx, product.UserID)
+	errGetUser := pcs.userQueryClient.GetUserByID(ctx, product.UserID)
 	if errGetUser != nil {
 		return entity.Product{}, fmt.Errorf("invalid user: %w", errGetUser)
 	}
@@ -70,8 +68,9 @@ func (pcs *productCommandService) CreateProduct(ctx context.Context, product ent
 	return createdProduct, nil
 }
 
+
 func (pcs *productCommandService) UpdateProductByID(ctx context.Context, id string, product entity.Product, imageBytes []byte, imageFilename string) (entity.Product, error) {
-	_, errGetUser := pcs.userQueryClient.GetUserByID(ctx, product.UserID)
+	errGetUser := pcs.userQueryClient.GetUserByID(ctx, product.UserID)
 	if errGetUser != nil {
 		return entity.Product{}, fmt.Errorf("invalid user: %w", errGetUser)
 	}
