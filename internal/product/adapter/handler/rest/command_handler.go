@@ -1,6 +1,7 @@
 package rest // inbound
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"product-service-api/internal/product/application/port"
@@ -22,16 +23,24 @@ func NewProductCommandHandler(pcs port.ProductCommandServiceInterface, pqs port.
 		productQueryService:   pqs,
 	}
 }
-
 func (h *productCommandHandler) CreateProduct(c echo.Context) error {
-	 ctx := c.Request().Context()
-	userID, role, errExtract := middleware.ExtractToken(c)
-	if errExtract != nil {
+	userID, ok := c.Get("id").(string)
+	if !ok || userID == "" {
+		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
+	}
+
+	role, ok := c.Get("role").(string)
+	if !ok || role == "" {
 		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
 	}
 
 	if role != constant.SELLER {
 		return c.JSON(http.StatusForbidden, response.ErrorResponse(constant.ERROR_ROLE_ACCESS))
+	}
+
+	rawToken, ok := c.Get(middleware.ClaimTokenJWT).(string)
+	if !ok || rawToken == "" {
+		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
 	}
 
 	var productRequest CreateProductRequest
@@ -41,7 +50,6 @@ func (h *productCommandHandler) CreateProduct(c echo.Context) error {
 
 	var imageBytes []byte
 	var imageFilename string
-
 	imageFile, err := c.FormFile("image_url")
 	if imageFile != nil && err == nil {
 		src, err := imageFile.Open()
@@ -59,6 +67,8 @@ func (h *productCommandHandler) CreateProduct(c echo.Context) error {
 
 	product := CreateProductRequestToEntity(productRequest, userID)
 
+	ctx := context.WithValue(c.Request().Context(), middleware.ClaimTokenJWT, rawToken)
+
 	createdProduct, err := h.productCommandService.CreateProduct(ctx, product, imageBytes, imageFilename)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, response.ErrorResponse(err.Error()))
@@ -67,16 +77,29 @@ func (h *productCommandHandler) CreateProduct(c echo.Context) error {
 	productResponse := ProductEntityToResponse(createdProduct)
 
 	return c.JSON(http.StatusCreated, response.SuccessResponse(constant.SUCCESS_CREATED, productResponse))
-
 }
 
 func (ph *productCommandHandler) UpdateProductByID(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	userID, role, errExtract := middleware.ExtractToken(c)
-	if errExtract != nil {
+	userID, ok := c.Get("id").(string)
+	if !ok || userID == "" {
 		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
 	}
+
+	role, ok := c.Get("role").(string)
+	if !ok || role == "" {
+		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
+	}
+
+	rawToken, ok := c.Get(middleware.ClaimTokenJWT).(string)
+	if !ok || rawToken == "" {
+		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
+	}
+
+	if role != constant.SELLER {
+		return c.JSON(http.StatusForbidden, response.ErrorResponse(constant.ERROR_ROLE_ACCESS))
+	}
+
+	ctx := context.WithValue(c.Request().Context(), middleware.ClaimTokenJWT, rawToken)
 
 	productID := c.Param("id")
 	if productID == "" {
@@ -92,10 +115,6 @@ func (ph *productCommandHandler) UpdateProductByID(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, response.ErrorResponse("forbidden access"))
 	}
 
-	if role != constant.SELLER {
-		return c.JSON(http.StatusForbidden, response.ErrorResponse(constant.ERROR_ROLE_ACCESS))
-	}
-
 	var productRequest UpdateProductRequest
 	if err := c.Bind(&productRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, response.ErrorResponse(err.Error()))
@@ -103,7 +122,6 @@ func (ph *productCommandHandler) UpdateProductByID(c echo.Context) error {
 
 	var imageBytes []byte
 	var imageFilename string
-
 	imageFile, err := c.FormFile("image_url")
 	if imageFile != nil && err == nil {
 		src, err := imageFile.Open()
@@ -131,12 +149,26 @@ func (ph *productCommandHandler) UpdateProductByID(c echo.Context) error {
 }
 
 func (ph *productCommandHandler) DeleteProductByID(c echo.Context) error {
-	ctx := c.Request().Context()
-
-	userID, role, errExtract := middleware.ExtractToken(c)
-	if errExtract != nil {
+	userID, ok := c.Get("id").(string)
+	if !ok || userID == "" {
 		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
 	}
+
+	role, ok := c.Get("role").(string)
+	if !ok || role == "" {
+		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
+	}
+
+	rawToken, ok := c.Get(middleware.ClaimTokenJWT).(string)
+	if !ok || rawToken == "" {
+		return c.JSON(http.StatusUnauthorized, response.ErrorResponse("unauthorized access"))
+	}
+
+	if role != constant.SELLER {
+		return c.JSON(http.StatusForbidden, response.ErrorResponse(constant.ERROR_ROLE_ACCESS))
+	}
+
+	ctx := context.WithValue(c.Request().Context(), middleware.ClaimTokenJWT, rawToken)
 
 	productID := c.Param("id")
 	if productID == "" {
@@ -150,10 +182,6 @@ func (ph *productCommandHandler) DeleteProductByID(c echo.Context) error {
 
 	if product.UserID != userID {
 		return c.JSON(http.StatusForbidden, response.ErrorResponse("forbidden access"))
-	}
-
-	if role != constant.SELLER {
-		return c.JSON(http.StatusForbidden, response.ErrorResponse(constant.ERROR_ROLE_ACCESS))
 	}
 
 	if err := ph.productCommandService.DeleteProductByID(ctx, productID); err != nil {
