@@ -1,25 +1,104 @@
-# product-service-api
+# Go Commerce : E-Commerce Platform [ Product Service ]
 
-## 📌 Overview
-This project is a simple e-commerce system that includes key features such as user management (sellers and buyers), product catalog, and payment system using Midtrans payment gateway.
+## 📝 Project Overview
+Go Commerce is an e-commerce system that provides user account management (buyer and seller roles), product management, and secure payment processing through the payment gateway
+
+## 🎯 Problem Statement & Solution
+
+#### Problem Statement
+Many users and sellers face challenges managing their online sales and purchases due to difficulties in tracking products, handling orders, and processing payments securely. Manual processes or fragmented systems can lead to errors, delayed transactions, and poor user experience.
+
+#### Solution
+Go Commerce provides a comprehensive e-commerce platform that centralizes user account management, product management, and payment processing. The platform allows users to:
+
+* Create and manage buyer or seller accounts efficiently
+* Add, update, and manage product listings
+* Process payments securely through integrated payment gateways
+* Track orders and transactions seamlessly in one system
+
+By centralizing these processes, Go Commerce improves operational efficiency, reduces errors, and enhances the overall online shopping experience for both buyers and sellers.
+
+## 📚 Documentation
+* [Go Commerce with REST API](https://github.com/fildzaanf/go-commerce-api)
 
 ## 🚀 Tools and Technologies 
-- Go Programming Language
-- Echo Framework
-- GORM
-- MySQL / PostgreSQL
-- Docker
-- JWT Authentication
-- Midtrans Payment Gateway
-- Amazon Simple Storage Service (S3)
-- Simple Mail Transfer Protocol (SMTP)
-- gRPC (Remote Procedure Call)
+* Go Programming Language
+* Echo Go Framework
+* GORM for Object Relational Mapping
+* MySQL / PostgreSQL for Relational Database
+* JSON Web Token (JWT) for Authentication
+* Docker for Containerization
+* Midtrans Payment Gateway integrated with Webhooks, SMTP, and GoMail for real-time payment notifications
+* Amazon Web Services (AWS)
+  * Amazon Simple Storage Service (S3)
+* GRPC for efficient, low-latency, and strongly-typed API communication
 
 ## 🏛️ System Design and Architecture
-- Hexagonal Architecture
-- Clean Architecture
-- Domain-Driven Design (DDD)
-- Command Query Responsibility Segregation (CQRS)
+
+* Clean Architecture
+* Hexagonal Architecture
+* Domain-Driven Design (DDD)
+* Command Query Responsibility Segregation (CQRS)
+* Microservices Architecture
+* REST API
+* GRPC
+* Webhook
+
+## ✨ Features
+
+#### User Management
+
+| Feature                   | Description                                                        |
+| ------------------------- | ------------------------------------------------------------------ |
+| User Registration & Login | Allows users to register and log in to access the platform         |
+| Profile                   | Provides functionality to retrieve user profile information by ID  |
+
+#### Product Management
+
+| Feature           | Description                                                                    |
+| ----------------- | ------------------------------------------------------------------------------ |
+| Create Product    | Enables adding new products to the platform                                    |
+| Update Product    | Allows updating existing product details by product ID                         |
+| Delete Product    | Supports removing products from the platform by product ID                     |
+| Retrieve Product  | Provides access to a single product by ID or a list of all available products  |
+
+#### Payment Management
+
+| Feature             | Description                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| Create Payment      | Allows users to create new payments for products or services                         |
+| Retrieve Payment    | Provides access to all payments or details of a specific payment by ID               |
+| Integration Payment | Supports real-time payment updates via Midtrans Webhook integration                  |
+| Integration Email   | Integrated Midtrans Payment Gateway using Webhooks with SMTP and Go Mail to automate | 
+|                     | event-driven email notifications based on real-time payment status updates           |
+
+## 📡 gRPC Services
+
+#### Products
+
+| RPC Method     | RPC Type | Description             |
+|---------------|----------|-------------------------|
+| CreateProduct | Unary    | Create new product      |
+| UpdateProduct | Unary    | Update product data     |
+| DeleteProduct | Unary    | Delete product          |
+| GetProductByID | Unary    | Retrieve product by ID      |
+| GetAllProducts | Unary    | Retrieve all products       |
+
+
+
+
+## 📡 API Endpoints
+
+#### Products
+
+| Method | Endpoint      | Description                    |
+| ------ | ------------- | ------------------------------ |
+| POST   | /products     | Create a new product           |
+| PUT    | /products/:id | Update product details by ID   |
+| DELETE | /products/:id | Delete product by ID           |
+| GET    | /products/:id | Retrieve product details by ID |
+| GET    | /products     | Retrieve all products          |
+
 
 ## 📂 Folder Structure
 ```
@@ -97,30 +176,4 @@ product-service-api/
 ├── go.sum                                      # Go dependency checksums
 └── README.md                                   # Main project documentation
 ```
-## 🛠️ Installation & Running the Project
-### 1️⃣ Prerequisites
-Make sure you have installed:
-- [Go](https://go.dev/dl/)
-- [PostgreSQL](https://www.postgresql.org/download/) / [MySQL](https://dev.mysql.com/downloads/)
-- [Midtrans](https://midtrans.com/)
-
-### 2️⃣ Clone the Repository
-```bash
-git clone <repo-url>
-cd <repository-root-directory>
-```
-
-### 3️⃣ Configure Environment
-Create a `.env` file based on `.env.example` and place it in the root directory.
-
-### 4️⃣ Run the Application
-```bash
-go run cmd/grpc/grpc_server.go
-go run cmd/rest/rest_server.go
-```
-
-
-
-
-
 
